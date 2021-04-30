@@ -37,12 +37,13 @@ namespace Academia.Controllers
             return Ok(listaClientes);
         }
 
-        [HttpGet("{cpfcliente}", Name = "BuscarClientePorCPF")]
+        [HttpGet("BuscarClientePorCPF")]
         public IActionResult BuscarClientePorCPF(string cpfcliente)
         {
             if (clienteService.BuscarClientePorCpf(cpfcliente) != null)
             {
                 var clienteNoBanco = clienteService.BuscarClientePorCpf(cpfcliente);
+                cliente = new Cliente();
 
                 cliente.IdCliente = clienteNoBanco.IdCliente;
                 cliente.CPFCliente = clienteNoBanco.CPFCliente;

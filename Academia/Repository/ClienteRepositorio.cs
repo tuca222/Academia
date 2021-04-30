@@ -61,6 +61,7 @@ namespace Academia.Repository
                     {
                         cliente = new Cliente();
 
+                        cliente.IdCliente = Convert.ToInt32(dataReader["IdCliente"]);
                         cliente.CPFCliente = dataReader["CPFCliente"].ToString();
                         cliente.NomeCliente = dataReader["NomeCliente"].ToString();
                         cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
