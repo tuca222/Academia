@@ -11,6 +11,7 @@ namespace Academia.Models
         public string CPFCliente { get; set; }
         public string NomeCliente { get; set; }
         public bool StatusCliente { get; set; }
+        public EnderecoCliente enderecoCliente { get; set; }
 
         public Cliente()
         {

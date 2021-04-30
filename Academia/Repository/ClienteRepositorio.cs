@@ -11,6 +11,8 @@ namespace Academia.Repository
 {
     public class ClienteRepositorio : IClienteRepositorio
     {
+        EnderecoClienteRepositorio enderecoClienteRepositorio = new EnderecoClienteRepositorio();
+
         public void AtualizarCliente(Cliente cliente)
         {
             try
@@ -65,6 +67,7 @@ namespace Academia.Repository
                         cliente.CPFCliente = dataReader["CPFCliente"].ToString();
                         cliente.NomeCliente = dataReader["NomeCliente"].ToString();
                         cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
+                        cliente.enderecoCliente = enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
                     }
                     connection.Close();
                     connection.Dispose();
@@ -152,7 +155,7 @@ namespace Academia.Repository
                     cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
 
                     connection.Open();
-                    cmd.ExecuteNonQuery();
+                    int teste = Convert.ToInt32(cmd.ExecuteScalar());
                     connection.Close();
                     connection.Dispose();
                 }

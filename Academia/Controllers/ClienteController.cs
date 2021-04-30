@@ -49,6 +49,7 @@ namespace Academia.Controllers
                 cliente.CPFCliente = clienteNoBanco.CPFCliente;
                 cliente.NomeCliente = clienteNoBanco.NomeCliente;
                 cliente.StatusCliente = clienteNoBanco.StatusCliente;
+                cliente.enderecoCliente = clienteNoBanco.enderecoCliente;
             }
             return Ok(cliente);
         }
