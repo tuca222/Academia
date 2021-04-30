@@ -9,21 +9,23 @@ using System.Threading.Tasks;
 namespace Academia.Controllers
 {
     [ApiController]
-    [Route("Api/Controller")]
+    [Route("Api/[Controller]")]
     public class ClienteController : Controller
     {
         private readonly ClienteService clienteService = new ClienteService();
-        Cliente cliente = new Cliente();
+        Cliente cliente = null;
 
         [HttpGet]
         public IActionResult BuscarTodosClientes()
         {
-            List<Cliente> listaClientes = null;
+            List<Cliente> listaClientes = new List<Cliente>();
 
             if (clienteService.BuscarTodosClientes() != null)
             {
                 foreach (Cliente clienteNoBanco in clienteService.BuscarTodosClientes())
                 {
+                    cliente = new Cliente();
+
                     cliente.IdCliente = clienteNoBanco.IdCliente;
                     cliente.CPFCliente = clienteNoBanco.CPFCliente;
                     cliente.NomeCliente = clienteNoBanco.NomeCliente;
@@ -35,12 +37,12 @@ namespace Academia.Controllers
             return Ok(listaClientes);
         }
 
-        [HttpGet("{cpfcliente})", Name = "BuscarClientePorCPF")]
-        public IActionResult BuscarClientePorCPF(string CPFCliente)
+        [HttpGet("{cpfcliente}", Name = "BuscarClientePorCPF")]
+        public IActionResult BuscarClientePorCPF(string cpfcliente)
         {
-            if (clienteService.BuscarClientePorCpf(CPFCliente) != null)
+            if (clienteService.BuscarClientePorCpf(cpfcliente) != null)
             {
-                var clienteNoBanco = clienteService.BuscarClientePorCpf(CPFCliente);
+                var clienteNoBanco = clienteService.BuscarClientePorCpf(cpfcliente);
 
                 cliente.IdCliente = clienteNoBanco.IdCliente;
                 cliente.CPFCliente = clienteNoBanco.CPFCliente;
@@ -73,8 +75,8 @@ namespace Academia.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        public IActionResult DesativarCliente([FromBody]Cliente cliente)
+        [HttpPatch]
+        public IActionResult DesativarCliente([FromBody] Cliente cliente)
         {
             if (cliente == null)
             {

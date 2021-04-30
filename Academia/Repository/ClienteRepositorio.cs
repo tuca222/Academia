@@ -16,7 +16,7 @@ namespace Academia.Repository
             try
             {
                 string consulta = String.Format("Update Cliente set CPFCliente = @CPFCliente, " +
-                    "NomeCliente = @NomeCliente, StatusCliente = @StatusCliente)");
+                    "NomeCliente = @NomeCliente, StatusCliente = @StatusCliente where IdCliente = @IdCliente");
 
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
@@ -25,6 +25,7 @@ namespace Academia.Repository
                     cmd.Parameters.AddWithValue("@CPFCliente", cliente.CPFCliente);
                     cmd.Parameters.AddWithValue("@NomeCliente", cliente.NomeCliente);
                     cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
+                    cmd.Parameters.AddWithValue("@IdCliente", cliente.IdCliente);
 
                     connection.Open();
                     cmd.ExecuteNonQuery();
@@ -79,7 +80,7 @@ namespace Academia.Repository
         {
             try
             {
-                List<Cliente> clientes = new List<Cliente>();
+                List<Cliente> listaClientes = new List<Cliente>();
                 Cliente cliente = null;
 
                 string consulta = "Select IdCliente, CPFCliente, NomeCliente, StatusCliente from Cliente";
@@ -103,13 +104,13 @@ namespace Academia.Repository
                             cliente.NomeCliente = dataReader["NomeCliente"].ToString();
                             cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
 
-                            clientes.Add(cliente);
+                            listaClientes.Add(cliente);
                         }
                     }
                     connection.Close();
                     connection.Dispose();
                 }
-                return clientes;
+                return listaClientes;
             }
             catch(Exception ex)
             {
@@ -119,13 +120,13 @@ namespace Academia.Repository
 
         public void DesativarCliente(Cliente cliente)
         {
-            string consulta = "Update Cliente set StatusCliente = 0 where CPFCliente = @CPFCliente";
+            string consulta = "Update Cliente set StatusCliente = 0 where IdCliente = @IdCliente";
 
             SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
             using(SqlCommand cmd = new SqlCommand(consulta, connection))
             {
-                cmd.Parameters.AddWithValue("@CPFCliente", cliente.CPFCliente);
+                cmd.Parameters.AddWithValue("@IdCliente", cliente.IdCliente);
                 connection.Open();
 
                 cmd.ExecuteNonQuery();
