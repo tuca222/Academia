@@ -9,5 +9,6 @@ namespace Academia.Interfaces
     public interface IEnderecoClienteRepositorio
     {
         public EnderecoCliente BuscarEnderecoPorIdCliente(int idCliente);
+        public void InserirEnderecoCliente(EnderecoCliente enderecoCliente);
     }
 }

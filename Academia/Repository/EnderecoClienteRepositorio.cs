@@ -48,5 +48,34 @@ namespace Academia.Repository
                 throw ex;
             }
         }
+
+        public void InserirEnderecoCliente(EnderecoCliente enderecoCliente)
+        {
+            try
+            {
+                string consulta = String.Format("Insert into Endereco (LogradouroCliente, BairroCliente, IdCliente) " +
+                    "Values (@LogradouroCliente, @BairroCliente, @IdCliente)");
+
+                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+
+                using (SqlCommand cmd = new SqlCommand(consulta, connection))
+                {
+                    cmd.Parameters.AddWithValue("@LogradouroCliente", enderecoCliente.LogradouroCliente);
+                    cmd.Parameters.AddWithValue("@BairroCliente", enderecoCliente.BairroCliente);
+                    cmd.Parameters.AddWithValue("@IdCliente", enderecoCliente.IdCliente);
+
+                    connection.Open();
+
+                    cmd.ExecuteNonQuery();
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+
+        }
     }
 }

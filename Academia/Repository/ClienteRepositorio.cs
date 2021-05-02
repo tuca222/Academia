@@ -107,6 +107,7 @@ namespace Academia.Repository
                             cliente.CPFCliente = dataReader["CpfCliente"].ToString();
                             cliente.NomeCliente = dataReader["NomeCliente"].ToString();
                             cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
+                            cliente.enderecoCliente = enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
 
                             listaClientes.Add(cliente);
                         }
@@ -143,7 +144,7 @@ namespace Academia.Repository
         {
             try
             {
-                string consulta = String.Format("Insert into Cliente (CPFCliente, NomeCliente, StatusCliente) " +
+                string consulta = String.Format("Insert into Cliente (CPFCliente, NomeCliente, StatusCliente) Output Inserted.IdCliente " +
                 "Values (@CPFCliente, @NomeCliente, @StatusCliente)");
 
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
@@ -155,7 +156,16 @@ namespace Academia.Repository
                     cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
 
                     connection.Open();
-                    int teste = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    int idCliente = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    EnderecoCliente enderecoCliente = new EnderecoCliente();
+                    enderecoCliente.LogradouroCliente = cliente.enderecoCliente.LogradouroCliente;
+                    enderecoCliente.BairroCliente = cliente.enderecoCliente.BairroCliente;
+                    enderecoCliente.IdCliente = idCliente;
+
+                    enderecoClienteRepositorio.InserirEnderecoCliente(enderecoCliente);
+
                     connection.Close();
                     connection.Dispose();
                 }
