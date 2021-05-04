@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,21 +17,29 @@ namespace Academia.Repository
         public void AtualizarCliente(Cliente cliente)
         {
             try
-            {
-                string consulta = String.Format("Update Cliente set CPFCliente = @CPFCliente, " +
-                    "NomeCliente = @NomeCliente, StatusCliente = @StatusCliente where IdCliente = @IdCliente");
-
+            {              
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
-                using (SqlCommand cmd = new SqlCommand(consulta, connection))
+                using (SqlCommand cmd = new SqlCommand())
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "AtualizaCliente";
+
                     cmd.Parameters.AddWithValue("@CPFCliente", cliente.CPFCliente);
                     cmd.Parameters.AddWithValue("@NomeCliente", cliente.NomeCliente);
                     cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
                     cmd.Parameters.AddWithValue("@IdCliente", cliente.IdCliente);
 
-                    connection.Open();
+                    cmd.Connection = connection;
+                    cmd.Connection.Open();
                     cmd.ExecuteNonQuery();
+
+                    EnderecoCliente enderecoCliente = new EnderecoCliente();
+                    enderecoCliente.LogradouroCliente = cliente.enderecoCliente.LogradouroCliente;
+                    enderecoCliente.BairroCliente = cliente.enderecoCliente.BairroCliente;
+                    enderecoCliente.IdCliente = cliente.IdCliente;
+                    enderecoClienteRepositorio.AtualizarEnderecoCliente(enderecoCliente);
+
                     connection.Close();
                     connection.Dispose();
                 }
@@ -47,16 +56,16 @@ namespace Academia.Repository
             {
                 Cliente cliente = null;
 
-                string consulta = String.Format("Select IdCliente, CPFCliente, NomeCliente, " +
-                    "StatusCliente from Cliente where CPFCliente = @CPFCliente");
-
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
-                using (SqlCommand cmd = new SqlCommand(consulta, connection))
+                using (SqlCommand cmd = new SqlCommand())
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "BuscaClientePorCpf";
                     cmd.Parameters.AddWithValue("@CPFCliente", cpfCliente);
+                    cmd.Connection = connection;
 
-                    connection.Open();
+                    cmd.Connection.Open();
                     SqlDataReader dataReader = cmd.ExecuteReader();
 
                     while (dataReader.Read())
@@ -87,13 +96,15 @@ namespace Academia.Repository
                 List<Cliente> listaClientes = new List<Cliente>();
                 Cliente cliente = null;
 
-                string consulta = "Select IdCliente, CPFCliente, NomeCliente, StatusCliente from Cliente";
 
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
-                using (SqlCommand cmd = new SqlCommand(consulta, connection))
+                using (SqlCommand cmd = new SqlCommand())
                 {
-                    connection.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "BuscaTodosClientes";
+                    cmd.Connection = connection;
+                    cmd.Connection.Open();
 
                     SqlDataReader dataReader = cmd.ExecuteReader();
 
@@ -107,7 +118,6 @@ namespace Academia.Repository
                             cliente.CPFCliente = dataReader["CpfCliente"].ToString();
                             cliente.NomeCliente = dataReader["NomeCliente"].ToString();
                             cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
-                            cliente.enderecoCliente = enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
 
                             listaClientes.Add(cliente);
                         }
@@ -125,16 +135,19 @@ namespace Academia.Repository
 
         public void DesativarCliente(Cliente cliente)
         {
-            string consulta = "Update Cliente set StatusCliente = 0 where IdCliente = @IdCliente";
-
             SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
-            using(SqlCommand cmd = new SqlCommand(consulta, connection))
+            using(SqlCommand cmd = new SqlCommand())
             {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "DesativaCliente";
                 cmd.Parameters.AddWithValue("@IdCliente", cliente.IdCliente);
-                connection.Open();
+
+                cmd.Connection = connection;
+                cmd.Connection.Open();
 
                 cmd.ExecuteNonQuery();
+
                 connection.Close();
                 connection.Dispose();
             }
@@ -144,18 +157,19 @@ namespace Academia.Repository
         {
             try
             {
-                string consulta = String.Format("Insert into Cliente (CPFCliente, NomeCliente, StatusCliente) Output Inserted.IdCliente " +
-                "Values (@CPFCliente, @NomeCliente, @StatusCliente)");
-
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
-                using (SqlCommand cmd = new SqlCommand(consulta, connection))
+                using (SqlCommand cmd = new SqlCommand())
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "InsereCliente";
+
                     cmd.Parameters.AddWithValue("@CPFCliente", cliente.CPFCliente);
                     cmd.Parameters.AddWithValue("@NomeCliente", cliente.NomeCliente);
                     cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
 
-                    connection.Open();
+                    cmd.Connection = connection;
+                    cmd.Connection.Open();
 
                     int idCliente = Convert.ToInt32(cmd.ExecuteScalar());
 

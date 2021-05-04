@@ -10,5 +10,6 @@ namespace Academia.Interfaces
     {
         public EnderecoCliente BuscarEnderecoPorIdCliente(int idCliente);
         public void InserirEnderecoCliente(EnderecoCliente enderecoCliente);
+        public void AtualizarEnderecoCliente(EnderecoCliente enderecoCliente);
     }
 }

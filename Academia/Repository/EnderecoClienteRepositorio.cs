@@ -6,26 +6,58 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Academia.Useful;
+using System.Data;
 
 namespace Academia.Repository
 {
     public class EnderecoClienteRepositorio : IEnderecoClienteRepositorio
     {
+        public void AtualizarEnderecoCliente(EnderecoCliente enderecoCliente)
+        {
+            try
+            {
+                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "AtualizaEnderecoCliente";
+
+                    cmd.Parameters.AddWithValue("@LogradouroCliente", enderecoCliente.LogradouroCliente);
+                    cmd.Parameters.AddWithValue("@BairroCliente", enderecoCliente.BairroCliente);
+                    cmd.Parameters.AddWithValue("@IdCliente", enderecoCliente.IdCliente);
+
+                    cmd.Connection = connection;
+                    cmd.Connection.Open();
+
+                    cmd.ExecuteNonQuery();
+
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public EnderecoCliente BuscarEnderecoPorIdCliente(int idCliente)
         {
             try
             {
                 EnderecoCliente enderecoCliente = null;
 
-                string consulta = String.Format("Select IdEnderecoCliente, LogradouroCliente, " +
-                    "BairroCliente, IdCliente from Endereco where IdCliente = @IdCliente");
-
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
-                connection.Open();
 
-                using(SqlCommand cmd = new SqlCommand(consulta, connection))
+                using(SqlCommand cmd = new SqlCommand())
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "BuscaEnderecoPorIdCliente";
+
                     cmd.Parameters.AddWithValue("@IdCliente", idCliente);
+                    cmd.Connection = connection;
+                    cmd.Connection.Open();
 
                     SqlDataReader dataReader = cmd.ExecuteReader();
 
@@ -53,18 +85,18 @@ namespace Academia.Repository
         {
             try
             {
-                string consulta = String.Format("Insert into Endereco (LogradouroCliente, BairroCliente, IdCliente) " +
-                    "Values (@LogradouroCliente, @BairroCliente, @IdCliente)");
-
                 SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
 
-                using (SqlCommand cmd = new SqlCommand(consulta, connection))
+                using (SqlCommand cmd = new SqlCommand())
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "InsereEnderecoCliente";
+
                     cmd.Parameters.AddWithValue("@LogradouroCliente", enderecoCliente.LogradouroCliente);
                     cmd.Parameters.AddWithValue("@BairroCliente", enderecoCliente.BairroCliente);
                     cmd.Parameters.AddWithValue("@IdCliente", enderecoCliente.IdCliente);
-
-                    connection.Open();
+                    cmd.Connection = connection;
+                    cmd.Connection.Open();
 
                     cmd.ExecuteNonQuery();
                     connection.Close();
