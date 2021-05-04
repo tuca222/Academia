@@ -10,31 +10,36 @@ namespace Academia.Services
 {
     public class ClienteService : IClienteService
     {
-        private readonly ClienteRepositorio clienteRepositorio = new ClienteRepositorio();
+        private readonly IClienteRepositorio _clienteRepositorio;
+
+        public ClienteService(IClienteRepositorio clienteRepositorio)
+        {
+            _clienteRepositorio = clienteRepositorio;
+        }
 
         public void AtualizarCliente(Cliente cliente)
         {
-            clienteRepositorio.AtualizarCliente(cliente);
+            _clienteRepositorio.AtualizarCliente(cliente);
         }
 
         public Cliente BuscarClientePorCpf(string cpfCliente)
         {
-            return clienteRepositorio.BuscarClientePorCpf(cpfCliente);
+            return _clienteRepositorio.BuscarClientePorCpf(cpfCliente);
         }
 
         public IEnumerable<Cliente> BuscarTodosClientes()
         {
-            return clienteRepositorio.BuscarTodosClientes();
+            return _clienteRepositorio.BuscarTodosClientes();
         }
 
         public void DesativarCliente(Cliente cliente)
         {
-            clienteRepositorio.DesativarCliente(cliente);
+            _clienteRepositorio.DesativarCliente(cliente);
         }
 
         public void InserirCliente(Cliente cliente)
         {
-            clienteRepositorio.InserirCliente(cliente);
+            _clienteRepositorio.InserirCliente(cliente);
         }
     }
 }

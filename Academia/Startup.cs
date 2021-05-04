@@ -1,3 +1,6 @@
+using Academia.Interfaces;
+using Academia.Repository;
+using Academia.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +28,10 @@ namespace Academia
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IClienteService, ClienteService>();
+            services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
+            services.AddScoped<IEnderecoClienteRepositorio, EnderecoClienteRepositorio>();
+
             services.AddControllers();
         }
 

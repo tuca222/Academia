@@ -5,18 +5,25 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Academia.Useful;
 using System.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace Academia.Repository
 {
     public class EnderecoClienteRepositorio : IEnderecoClienteRepositorio
     {
+        private readonly IConfiguration _configuration;
+
+        public EnderecoClienteRepositorio(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void AtualizarEnderecoCliente(EnderecoCliente enderecoCliente)
         {
             try
             {
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -48,7 +55,7 @@ namespace Academia.Repository
             {
                 EnderecoCliente enderecoCliente = null;
 
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using(SqlCommand cmd = new SqlCommand())
                 {
@@ -85,7 +92,7 @@ namespace Academia.Repository
         {
             try
             {
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using (SqlCommand cmd = new SqlCommand())
                 {

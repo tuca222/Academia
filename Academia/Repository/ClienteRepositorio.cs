@@ -6,19 +6,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Academia.Interfaces;
 using Academia.Models;
-using Academia.Useful;
+using Microsoft.Extensions.Configuration;
 
 namespace Academia.Repository
 {
     public class ClienteRepositorio : IClienteRepositorio
     {
-        EnderecoClienteRepositorio enderecoClienteRepositorio = new EnderecoClienteRepositorio();
+        private readonly IEnderecoClienteRepositorio _enderecoClienteRepositorio;
+
+        private readonly IConfiguration _configuration;
+
+        public ClienteRepositorio(IEnderecoClienteRepositorio enderecoClienteRepositorio, IConfiguration configuration)
+        {
+            _enderecoClienteRepositorio = enderecoClienteRepositorio;
+            _configuration = configuration;
+        }
 
         public void AtualizarCliente(Cliente cliente)
         {
             try
             {              
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -34,11 +42,10 @@ namespace Academia.Repository
                     cmd.Connection.Open();
                     cmd.ExecuteNonQuery();
 
-                    EnderecoCliente enderecoCliente = new EnderecoCliente();
-                    enderecoCliente.LogradouroCliente = cliente.enderecoCliente.LogradouroCliente;
-                    enderecoCliente.BairroCliente = cliente.enderecoCliente.BairroCliente;
+                    var enderecoCliente = cliente.enderecoCliente;
                     enderecoCliente.IdCliente = cliente.IdCliente;
-                    enderecoClienteRepositorio.AtualizarEnderecoCliente(enderecoCliente);
+
+                    _enderecoClienteRepositorio.AtualizarEnderecoCliente(enderecoCliente);
 
                     connection.Close();
                     connection.Dispose();
@@ -56,7 +63,7 @@ namespace Academia.Repository
             {
                 Cliente cliente = null;
 
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -76,7 +83,7 @@ namespace Academia.Repository
                         cliente.CPFCliente = dataReader["CPFCliente"].ToString();
                         cliente.NomeCliente = dataReader["NomeCliente"].ToString();
                         cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
-                        cliente.enderecoCliente = enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
+                        cliente.enderecoCliente = _enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
                     }
                     connection.Close();
                     connection.Dispose();
@@ -97,7 +104,7 @@ namespace Academia.Repository
                 Cliente cliente = null;
 
 
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -135,7 +142,7 @@ namespace Academia.Repository
 
         public void DesativarCliente(Cliente cliente)
         {
-            SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
             using(SqlCommand cmd = new SqlCommand())
             {
@@ -157,7 +164,7 @@ namespace Academia.Repository
         {
             try
             {
-                SqlConnection connection = new SqlConnection(DataBaseHelper.stringConnection);
+                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -173,12 +180,10 @@ namespace Academia.Repository
 
                     int idCliente = Convert.ToInt32(cmd.ExecuteScalar());
 
-                    EnderecoCliente enderecoCliente = new EnderecoCliente();
-                    enderecoCliente.LogradouroCliente = cliente.enderecoCliente.LogradouroCliente;
-                    enderecoCliente.BairroCliente = cliente.enderecoCliente.BairroCliente;
+                    var enderecoCliente = cliente.enderecoCliente;
                     enderecoCliente.IdCliente = idCliente;
 
-                    enderecoClienteRepositorio.InserirEnderecoCliente(enderecoCliente);
+                    _enderecoClienteRepositorio.InserirEnderecoCliente(enderecoCliente);
 
                     connection.Close();
                     connection.Dispose();
