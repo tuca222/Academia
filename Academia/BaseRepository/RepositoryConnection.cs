@@ -26,8 +26,6 @@ namespace Academia.BaseRepository
 
         public SqlDataReader CommandBusca(string nomeProcedure, Dictionary<string, string> Parametros)
         {
-            SqlDataReader dataReader;
-
             try
             {
                 SqlCommand cmd = new SqlCommand();
@@ -43,12 +41,8 @@ namespace Academia.BaseRepository
                 cmd.Connection = Conexao();
                 cmd.Connection.Open();
 
-                //dataReader = cmd.ExecuteReader();
-
-                //cmd.Connection.Close();
-                //cmd.Dispose();
-
-                return cmd.ExecuteReader(); 
+                var teste = cmd.ExecuteReader();
+                return teste; 
 
             }
             catch (Exception ex)

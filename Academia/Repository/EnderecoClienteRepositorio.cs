@@ -14,36 +14,26 @@ namespace Academia.Repository
     {
         private readonly IConfiguration _configuration;
 
-        public EnderecoClienteRepositorio(IConfiguration configuration)
+        private readonly IRepositoryConnection _repositoryConnection;
+
+        private readonly Dictionary<string, string> dados = new Dictionary<string, string>();
+        public EnderecoClienteRepositorio(IConfiguration configuration,
+                                          IRepositoryConnection repositoryConnection)
         {
             _configuration = configuration;
+            _repositoryConnection = repositoryConnection;
         }
 
         public void AtualizarEnderecoCliente(EnderecoCliente enderecoCliente)
         {
             try
             {
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "AtualizaEnderecoCliente";
-
-                    cmd.Parameters.AddWithValue("@LogradouroCliente", enderecoCliente.LogradouroCliente);
-                    cmd.Parameters.AddWithValue("@BairroCliente", enderecoCliente.BairroCliente);
-                    cmd.Parameters.AddWithValue("@IdCliente", enderecoCliente.IdCliente);
-
-                    cmd.Connection = connection;
-                    cmd.Connection.Open();
-
-                    cmd.ExecuteNonQuery();
-
-                    connection.Close();
-                    connection.Dispose();
-                }
+                dados.Add("LogradouroCliente", enderecoCliente.LogradouroCliente);
+                dados.Add("@BairroCliente", enderecoCliente.BairroCliente);
+                dados.Add("IdCliente", enderecoCliente.IdCliente.ToString());
+                _repositoryConnection.CommandExecucaoSimples("AtualizaEnderecoCliente", dados);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -55,33 +45,25 @@ namespace Academia.Repository
             {
                 EnderecoCliente enderecoCliente = null;
 
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                dados.Add("@IdCliente", idCliente.ToString());
 
-                using(SqlCommand cmd = new SqlCommand())
+                var leitura = _repositoryConnection.CommandBusca("BuscaEnderecoPorIdCliente", dados);
+
+                while (leitura.Read())
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "BuscaEnderecoPorIdCliente";
+                    enderecoCliente = new EnderecoCliente();
 
-                    cmd.Parameters.AddWithValue("@IdCliente", idCliente);
-                    cmd.Connection = connection;
-                    cmd.Connection.Open();
-
-                    SqlDataReader dataReader = cmd.ExecuteReader();
-
-                    while (dataReader.Read())
-                    {
-                        enderecoCliente = new EnderecoCliente();
-
-                        enderecoCliente.IdEnderecoCliente = Convert.ToInt32(dataReader["IdEnderecoCliente"]);
-                        enderecoCliente.LogradouroCliente = dataReader["LogradouroCliente"].ToString();
-                        enderecoCliente.BairroCliente = dataReader["BairroCliente"].ToString();
-                    }
-                    connection.Close();
-                    connection.Dispose();
+                    enderecoCliente.IdEnderecoCliente = Convert.ToInt32(leitura["IdEnderecoCliente"]);
+                    enderecoCliente.LogradouroCliente = leitura["LogradouroCliente"].ToString();
+                    enderecoCliente.BairroCliente = leitura["BairroCliente"].ToString();
                 }
+
+                leitura.Close();
+                leitura.Dispose();
+
                 return enderecoCliente;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -91,25 +73,13 @@ namespace Academia.Repository
         {
             try
             {
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                dados.Add("@LogradouroCliente", enderecoCliente.LogradouroCliente);
+                dados.Add("@BairroCliente", enderecoCliente.BairroCliente);
+                dados.Add("IdCliente", enderecoCliente.IdCliente.ToString());
 
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "InsereEnderecoCliente";
-
-                    cmd.Parameters.AddWithValue("@LogradouroCliente", enderecoCliente.LogradouroCliente);
-                    cmd.Parameters.AddWithValue("@BairroCliente", enderecoCliente.BairroCliente);
-                    cmd.Parameters.AddWithValue("@IdCliente", enderecoCliente.IdCliente);
-                    cmd.Connection = connection;
-                    cmd.Connection.Open();
-
-                    cmd.ExecuteNonQuery();
-                    connection.Close();
-                    connection.Dispose();
-                }
+                _repositoryConnection.CommandExecucaoSimples("InsereEnderecoCliente", dados);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

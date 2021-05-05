@@ -58,22 +58,22 @@ namespace Academia.Repository
 
                 dados.Add("@CPFCliente", cpfCliente);
 
-                var Leitura = _repositoryConnection.CommandBusca("BuscarClientePorCpf", dados);
+                var leitura = _repositoryConnection.CommandBusca("BuscaClientePorCpf", dados);
 
-                if (Leitura.HasRows)
+
+                while (leitura.Read())
                 {
-                    while (Leitura.Read())
-                    {
-                        cliente = new Cliente();
+                    cliente = new Cliente();
 
-                        cliente.IdCliente = Convert.ToInt32(Leitura["IdCliente"]);
-                        cliente.CPFCliente = Leitura["CpfCliente"].ToString();
-                        cliente.NomeCliente = Leitura["NomeCliente"].ToString();
-                        cliente.StatusCliente = Convert.ToBoolean(Leitura["StatusCliente"]);
-                        cliente.enderecoCliente = _enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
-                    }
+                    cliente.IdCliente = Convert.ToInt32(leitura["IdCliente"]);
+                    cliente.CPFCliente = leitura["CpfCliente"].ToString();
+                    cliente.NomeCliente = leitura["NomeCliente"].ToString();
+                    cliente.StatusCliente = Convert.ToBoolean(leitura["StatusCliente"]);
+                    cliente.enderecoCliente = _enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
                 }
-                Leitura.Close();
+
+                leitura.Close();
+                leitura.Dispose();
 
                 return cliente;
             }
@@ -92,25 +92,27 @@ namespace Academia.Repository
                 List<Cliente> listaClientes = new List<Cliente>();
                 Cliente cliente = null;
 
-                var Leitura = _repositoryConnection.CommandBusca("BuscaTodosClientes", dados);
+                SqlDataReader dataReader = _repositoryConnection.CommandBusca("BuscaTodosClientes", dados);
+                var leitura = dataReader;
 
 
-                if (Leitura.HasRows)
+                if (leitura.HasRows)
                 {
-                    while (Leitura.Read())
+                    while (leitura.Read())
                     {
                         cliente = new Cliente();
 
-                        cliente.IdCliente = Convert.ToInt32(Leitura["IdCliente"]);
-                        cliente.CPFCliente = Leitura["CpfCliente"].ToString();
-                        cliente.NomeCliente = Leitura["NomeCliente"].ToString();
-                        cliente.StatusCliente = Convert.ToBoolean(Leitura["StatusCliente"]);
+                        cliente.IdCliente = Convert.ToInt32(leitura["IdCliente"]);
+                        cliente.CPFCliente = leitura["CpfCliente"].ToString();
+                        cliente.NomeCliente = leitura["NomeCliente"].ToString();
+                        cliente.StatusCliente = Convert.ToBoolean(leitura["StatusCliente"]);
 
                         listaClientes.Add(cliente);
                     }
                 }
 
-                Leitura.Close();
+                leitura.Close();
+                leitura.Dispose();
 
                 return listaClientes;
             }
@@ -125,9 +127,9 @@ namespace Academia.Repository
             try
             {
                 dados.Add("@IdCliente", cliente.IdCliente.ToString());
-                _repositoryConnection.CommandExecucaoSimples("AtualizaCliente", dados);
+                _repositoryConnection.CommandExecucaoSimples("DesativaCliente", dados);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

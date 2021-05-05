@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,6 +35,7 @@ namespace Academia
             services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
             services.AddScoped<IEnderecoClienteRepositorio, EnderecoClienteRepositorio>();
             services.AddScoped<IRepositoryConnection, RepositoryConnection>();
+            services.AddScoped<IDataReader, SqlDataReader>();
 
             services.AddControllers();
         }
