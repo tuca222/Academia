@@ -8,7 +8,7 @@ namespace Academia.Interfaces
 {
     public interface IClienteRepositorio
     {
-        public IEnumerable<Cliente> BuscarTodosClientes();
+        public List<Cliente> BuscarTodosClientes();
         public Cliente BuscarClientePorCpf(string cpfCliente);
         public void InserirCliente(Cliente cliente);
         public void AtualizarCliente(Cliente cliente);

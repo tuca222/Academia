@@ -16,40 +16,33 @@ namespace Academia.Repository
 
         private readonly IConfiguration _configuration;
 
-        public ClienteRepositorio(IEnderecoClienteRepositorio enderecoClienteRepositorio, IConfiguration configuration)
+        private readonly IRepositoryConnection _repositoryConnection;
+
+        private readonly Dictionary<string, string> dados = new Dictionary<string, string>();
+
+        public ClienteRepositorio(IEnderecoClienteRepositorio enderecoClienteRepositorio,
+                                  IConfiguration configuration,
+                                  IRepositoryConnection repositoryConnection)
         {
             _enderecoClienteRepositorio = enderecoClienteRepositorio;
             _configuration = configuration;
+            _repositoryConnection = repositoryConnection;
         }
 
         public void AtualizarCliente(Cliente cliente)
         {
             try
-            {              
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            {
+                dados.Add("@CPFCliente", cliente.CPFCliente);
+                dados.Add("@NomeCliente", cliente.NomeCliente);
+                dados.Add("@StatusCliente", cliente.StatusCliente.ToString());
+                dados.Add("@IdCliente", cliente.IdCliente.ToString());
+                _repositoryConnection.CommandExecucaoSimples("AtualizaCliente", dados);
 
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "AtualizaCliente";
+                var enderecoCliente = cliente.enderecoCliente;
+                enderecoCliente.IdCliente = cliente.IdCliente;
 
-                    cmd.Parameters.AddWithValue("@CPFCliente", cliente.CPFCliente);
-                    cmd.Parameters.AddWithValue("@NomeCliente", cliente.NomeCliente);
-                    cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
-                    cmd.Parameters.AddWithValue("@IdCliente", cliente.IdCliente);
-
-                    cmd.Connection = connection;
-                    cmd.Connection.Open();
-                    cmd.ExecuteNonQuery();
-
-                    var enderecoCliente = cliente.enderecoCliente;
-                    enderecoCliente.IdCliente = cliente.IdCliente;
-
-                    _enderecoClienteRepositorio.AtualizarEnderecoCliente(enderecoCliente);
-
-                    connection.Close();
-                    connection.Dispose();
-                }
+                _enderecoClienteRepositorio.AtualizarEnderecoCliente(enderecoCliente);
             }
             catch (Exception ex)
             {
@@ -63,78 +56,65 @@ namespace Academia.Repository
             {
                 Cliente cliente = null;
 
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                dados.Add("@CPFCliente", cpfCliente);
 
-                using (SqlCommand cmd = new SqlCommand())
+                var Leitura = _repositoryConnection.CommandBusca("BuscarClientePorCpf", dados);
+
+                if (Leitura.HasRows)
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "BuscaClientePorCpf";
-                    cmd.Parameters.AddWithValue("@CPFCliente", cpfCliente);
-                    cmd.Connection = connection;
-
-                    cmd.Connection.Open();
-                    SqlDataReader dataReader = cmd.ExecuteReader();
-
-                    while (dataReader.Read())
+                    while (Leitura.Read())
                     {
                         cliente = new Cliente();
 
-                        cliente.IdCliente = Convert.ToInt32(dataReader["IdCliente"]);
-                        cliente.CPFCliente = dataReader["CPFCliente"].ToString();
-                        cliente.NomeCliente = dataReader["NomeCliente"].ToString();
-                        cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
+                        cliente.IdCliente = Convert.ToInt32(Leitura["IdCliente"]);
+                        cliente.CPFCliente = Leitura["CpfCliente"].ToString();
+                        cliente.NomeCliente = Leitura["NomeCliente"].ToString();
+                        cliente.StatusCliente = Convert.ToBoolean(Leitura["StatusCliente"]);
                         cliente.enderecoCliente = _enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
                     }
-                    connection.Close();
-                    connection.Dispose();
                 }
+                Leitura.Close();
+
                 return cliente;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
+
+
         }
 
-        public IEnumerable<Cliente> BuscarTodosClientes()
+        public List<Cliente> BuscarTodosClientes()
         {
             try
             {
                 List<Cliente> listaClientes = new List<Cliente>();
                 Cliente cliente = null;
 
+                var Leitura = _repositoryConnection.CommandBusca("BuscaTodosClientes", dados);
 
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
-                using (SqlCommand cmd = new SqlCommand())
+                if (Leitura.HasRows)
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "BuscaTodosClientes";
-                    cmd.Connection = connection;
-                    cmd.Connection.Open();
-
-                    SqlDataReader dataReader = cmd.ExecuteReader();
-
-                    if (dataReader.HasRows)
+                    while (Leitura.Read())
                     {
-                        while (dataReader.Read())
-                        {
-                            cliente = new Cliente();
+                        cliente = new Cliente();
 
-                            cliente.IdCliente = Convert.ToInt32(dataReader["IdCliente"]);
-                            cliente.CPFCliente = dataReader["CpfCliente"].ToString();
-                            cliente.NomeCliente = dataReader["NomeCliente"].ToString();
-                            cliente.StatusCliente = Convert.ToBoolean(dataReader["StatusCliente"]);
+                        cliente.IdCliente = Convert.ToInt32(Leitura["IdCliente"]);
+                        cliente.CPFCliente = Leitura["CpfCliente"].ToString();
+                        cliente.NomeCliente = Leitura["NomeCliente"].ToString();
+                        cliente.StatusCliente = Convert.ToBoolean(Leitura["StatusCliente"]);
 
-                            listaClientes.Add(cliente);
-                        }
+                        listaClientes.Add(cliente);
                     }
-                    connection.Close();
-                    connection.Dispose();
                 }
+
+                Leitura.Close();
+
                 return listaClientes;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -142,21 +122,14 @@ namespace Academia.Repository
 
         public void DesativarCliente(Cliente cliente)
         {
-            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-
-            using(SqlCommand cmd = new SqlCommand())
+            try
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "DesativaCliente";
-                cmd.Parameters.AddWithValue("@IdCliente", cliente.IdCliente);
-
-                cmd.Connection = connection;
-                cmd.Connection.Open();
-
-                cmd.ExecuteNonQuery();
-
-                connection.Close();
-                connection.Dispose();
+                dados.Add("@IdCliente", cliente.IdCliente.ToString());
+                _repositoryConnection.CommandExecucaoSimples("AtualizaCliente", dados);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -164,32 +137,17 @@ namespace Academia.Repository
         {
             try
             {
-                SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                dados.Add("@CPFCliente", cliente.CPFCliente);
+                dados.Add("@NomeCliente", cliente.NomeCliente);
+                dados.Add("@StatusCliente", cliente.StatusCliente.ToString());
+                int numeroRegistro = _repositoryConnection.CommandInserir("InsereCliente", dados);
 
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "InsereCliente";
+                var enderecoCliente = cliente.enderecoCliente;
+                enderecoCliente.IdCliente = numeroRegistro;
 
-                    cmd.Parameters.AddWithValue("@CPFCliente", cliente.CPFCliente);
-                    cmd.Parameters.AddWithValue("@NomeCliente", cliente.NomeCliente);
-                    cmd.Parameters.AddWithValue("@StatusCliente", cliente.StatusCliente);
-
-                    cmd.Connection = connection;
-                    cmd.Connection.Open();
-
-                    int idCliente = Convert.ToInt32(cmd.ExecuteScalar());
-
-                    var enderecoCliente = cliente.enderecoCliente;
-                    enderecoCliente.IdCliente = idCliente;
-
-                    _enderecoClienteRepositorio.InserirEnderecoCliente(enderecoCliente);
-
-                    connection.Close();
-                    connection.Dispose();
-                }
+                _enderecoClienteRepositorio.InserirEnderecoCliente(enderecoCliente);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

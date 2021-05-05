@@ -75,7 +75,6 @@ namespace Academia.Repository
                         enderecoCliente.IdEnderecoCliente = Convert.ToInt32(dataReader["IdEnderecoCliente"]);
                         enderecoCliente.LogradouroCliente = dataReader["LogradouroCliente"].ToString();
                         enderecoCliente.BairroCliente = dataReader["BairroCliente"].ToString();
-                        enderecoCliente.IdCliente = Convert.ToInt32(dataReader["IdCliente"]);
                     }
                     connection.Close();
                     connection.Dispose();

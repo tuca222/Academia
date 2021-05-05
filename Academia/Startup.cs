@@ -1,3 +1,4 @@
+using Academia.BaseRepository;
 using Academia.Interfaces;
 using Academia.Repository;
 using Academia.Services;
@@ -31,6 +32,7 @@ namespace Academia
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
             services.AddScoped<IEnderecoClienteRepositorio, EnderecoClienteRepositorio>();
+            services.AddScoped<IRepositoryConnection, RepositoryConnection>();
 
             services.AddControllers();
         }
