@@ -50,10 +50,10 @@ namespace Academia.Repository
 
                 var leitura = _repositoryConnection.CommandBusca("BuscaEnderecoPorIdCliente", dados);
 
-                //DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(leitura);
+                DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(leitura);
 
                 //while (leitura.Read())
-                foreach (DataRow row in leitura.Rows)
+                foreach (DataRow row in dataTable.Rows)
                 {
                     enderecoCliente = new EnderecoCliente();
 

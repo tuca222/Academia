@@ -61,10 +61,9 @@ namespace Academia.Repository
 
                 var leitura = _repositoryConnection.CommandBusca("BuscaClientePorCpf", dados);
 
-                //DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(leitura);
+                DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(leitura);
 
-                //while (leitura.Read())
-                foreach (DataRow row in leitura.Rows)
+                foreach (DataRow row in dataTable.Rows)
                 {
                     cliente = new Cliente();
 
@@ -74,18 +73,12 @@ namespace Academia.Repository
                     cliente.StatusCliente = Convert.ToBoolean(row["StatusCliente"]);
                     cliente.enderecoCliente = _enderecoClienteRepositorio.BuscarEnderecoPorIdCliente(cliente.IdCliente);
                 }
-                
-                //leitura.Close();
-                //leitura.Dispose();
-
                 return cliente;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-
-
         }
 
         public List<Cliente> BuscarTodosClientes()
@@ -95,29 +88,21 @@ namespace Academia.Repository
                 List<Cliente> listaClientes = new List<Cliente>();
                 Cliente cliente = null;
 
-                //SqlDataReader leitura = _repositoryConnection.CommandBusca("BuscaTodosClientes", dados);
                 var leitura = _repositoryConnection.CommandBusca("BuscaTodosClientes", dados);
-                
-                //DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(leitura);
 
-                //if (leitura.HasRows)
-                //{
-                //    while (leitura.Read())
-                foreach (DataRow row in leitura.Rows)
+                DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(leitura);
+
+                foreach (DataRow row in dataTable.Rows)
                 {
-                        cliente = new Cliente();
+                    cliente = new Cliente();
 
-                        cliente.IdCliente = Convert.ToInt32(row["IdCliente"]);
-                        cliente.CPFCliente = row["CpfCliente"].ToString();
-                        cliente.NomeCliente = row["NomeCliente"].ToString();
-                        cliente.StatusCliente = Convert.ToBoolean(row["StatusCliente"]);
+                    cliente.IdCliente = Convert.ToInt32(row["IdCliente"]);
+                    cliente.CPFCliente = row["CpfCliente"].ToString();
+                    cliente.NomeCliente = row["NomeCliente"].ToString();
+                    cliente.StatusCliente = Convert.ToBoolean(row["StatusCliente"]);
 
-                        listaClientes.Add(cliente);
-                    }
-                //}
-
-                leitura.Dispose();
-
+                    listaClientes.Add(cliente);
+                }
                 return listaClientes;
             }
             catch (Exception ex)

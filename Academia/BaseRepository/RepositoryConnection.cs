@@ -25,7 +25,7 @@ namespace Academia.BaseRepository
             return _conn;
         }
 
-        public DataTable CommandBusca(string nomeProcedure, Dictionary<string, string> Parametros)
+        public string CommandBusca(string nomeProcedure, Dictionary<string, string> Parametros)
         {
             try
             {
@@ -47,8 +47,11 @@ namespace Academia.BaseRepository
                 var dataTable = new DataTable();
                 dataTable.Load(dataReader);
 
-                //return JsonConvert.SerializeObject(dataTable);
-                return dataTable;
+                dataReader.Close();
+                dataReader.Dispose();
+
+                return JsonConvert.SerializeObject(dataTable);
+                //return dataTable;
 
             }
             catch (Exception ex)

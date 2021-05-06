@@ -11,7 +11,7 @@ namespace Academia.Interfaces
     {
         //public SqlConnection Conexao();
 
-        public DataTable CommandBusca(string nomeProcedure, Dictionary<string, string> Parametros);
+        public string CommandBusca(string nomeProcedure, Dictionary<string, string> Parametros);
 
         public int CommandInserir(string nomeProcedure, Dictionary<string, string> Parametros);
 
