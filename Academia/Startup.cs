@@ -35,7 +35,6 @@ namespace Academia
             services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
             services.AddScoped<IEnderecoClienteRepositorio, EnderecoClienteRepositorio>();
             services.AddScoped<IRepositoryConnection, RepositoryConnection>();
-            services.AddScoped<IDataReader, SqlDataReader>();
 
             services.AddControllers();
         }

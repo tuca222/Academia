@@ -56,7 +56,8 @@ namespace Academia.Repository
             try
             {
                 Cliente cliente = null;
-                //dados.Add("@CPFCliente", cpfCliente);
+
+                dados.Add("@CPFCliente", cpfCliente);
 
                 var leitura = _repositoryConnection.CommandBusca("BuscaClientePorCpf", dados);
 
@@ -115,8 +116,7 @@ namespace Academia.Repository
                     }
                 //}
 
-                //leitura.Close();
-                //leitura.Dispose();
+                leitura.Dispose();
 
                 return listaClientes;
             }
